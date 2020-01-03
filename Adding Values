@@ -1,0 +1,44 @@
+BaseListEntry<T> reference = baseList.add(value);
+		baseListLength++;
+
+		if (indexListLength < indexMaxLength) {
+			// index is not full
+			if (head == null) {
+				head = new IndexListEntry<T>(value, null, reference);
+			} else {
+				IndexListEntry<T> temp = head;
+				while ((temp.next != null) && (temp.next.value.compareTo(value) < 0)) {
+					temp = temp.next;
+				}
+				if (temp.next == null) {
+					temp.next = new IndexListEntry<T>(value, null, reference);
+				} else {
+					temp.next = new IndexListEntry<T>(value, temp.next, reference);
+				}
+			}
+			indexListLength++;
+		} else {
+			// index is full, rebalance
+			IndexListEntry<T> currentIndex = head.next;
+
+			// implicit floor function
+			int intervalWidth = baseListLength / indexMaxLength;
+
+			// interval size adjustment based on modulo operation
+			int intervalAdj = baseListLength % indexMaxLength;
+
+			int indexPosition = 0;
+			for (int i = 1; i < indexMaxLength; i++) {
+				int offset = 0;
+				// adjust index position to minimize variance of interval size
+				if (intervalAdj - i >= 0)
+					offset = 1;
+				indexPosition = indexPosition + intervalWidth + offset;
+				BaseListEntry<T> newIndexTarget = baseList.getBaseListEntry(indexPosition);
+				currentIndex.pointer = newIndexTarget;
+				currentIndex.value = newIndexTarget.value;
+				currentIndex = currentIndex.next;
+			}
+		}
+		return true;
+	}
